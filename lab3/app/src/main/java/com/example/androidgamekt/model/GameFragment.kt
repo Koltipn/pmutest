@@ -1,8 +1,10 @@
 package com.example.androidgamekt.model
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +16,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.example.androidgamekt.R
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.random.Random
+import java.util.concurrent.TimeUnit
 
 class GameFragment : Fragment() {
 
@@ -24,14 +29,17 @@ class GameFragment : Fragment() {
     private lateinit var scoreView: TextView
     private lateinit var missesView: TextView
     private lateinit var statusView: TextView
+    private lateinit var timerView: TextView
     private lateinit var restartButton: Button
+
+    private val settingsViewModel: GameSettingsViewModel by activityViewModels()
 
     private val spawnHandler = Handler(Looper.getMainLooper())
     private val spawnRunnable = object : Runnable {
         override fun run() {
             if (!isRunning) return
             spawnBug()
-            spawnHandler.postDelayed(this, SPAWN_DELAY)
+            spawnHandler.postDelayed(this, spawnDelay)
         }
     }
 
@@ -40,6 +48,13 @@ class GameFragment : Fragment() {
     private var misses = 0
     private var fieldWidth = 0
     private var fieldHeight = 0
+    private var spawnDelay = DEFAULT_SPAWN_DELAY
+    private var maxBugsOnScreen = DEFAULT_MAX_BUGS
+    private var bonusIntervalMillis = DEFAULT_BONUS_INTERVAL
+    private var roundDurationSeconds = DEFAULT_ROUND_DURATION
+    private var remainingRoundMillis = DEFAULT_ROUND_DURATION * 1000L
+    private var roundTimer: CountDownTimer? = null
+    private var lastBonusSpawnAt = SystemClock.uptimeMillis()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +70,7 @@ class GameFragment : Fragment() {
         scoreView = view.findViewById(R.id.tvScore)
         missesView = view.findViewById(R.id.tvMisses)
         statusView = view.findViewById(R.id.tvStatus)
+        timerView = view.findViewById(R.id.tvTimer)
         restartButton = view.findViewById(R.id.btnRestart)
 
         restartButton.setOnClickListener { resetGame() }
@@ -74,6 +90,11 @@ class GameFragment : Fragment() {
         })
 
         updateScoreboard()
+        updateTimerView()
+
+        settingsViewModel.settings.observe(viewLifecycleOwner) { settings ->
+            applySettings(settings)
+        }
     }
 
     override fun onResume() {
@@ -94,7 +115,12 @@ class GameFragment : Fragment() {
 
     private fun startGame() {
         if (isRunning) return
+        if (remainingRoundMillis <= 0L) {
+            remainingRoundMillis = roundDurationSeconds * 1000L
+        }
         isRunning = true
+        lastBonusSpawnAt = SystemClock.uptimeMillis()
+        startRoundTimer(remainingRoundMillis)
         spawnHandler.post(spawnRunnable)
         statusView.text = getString(R.string.status_running)
     }
@@ -102,21 +128,26 @@ class GameFragment : Fragment() {
     private fun stopGame() {
         isRunning = false
         spawnHandler.removeCallbacks(spawnRunnable)
+        roundTimer?.cancel()
+        roundTimer = null
     }
 
     private fun resetGame() {
+        stopGame()
         score = 0
         misses = 0
         fieldView.removeAllViews()
+        remainingRoundMillis = roundDurationSeconds * 1000L
+        lastBonusSpawnAt = SystemClock.uptimeMillis()
         updateScoreboard()
+        updateTimerView()
         statusView.text = getString(R.string.status_restart)
-        if (!isRunning) {
-            startGame()
-        }
+        startGame()
     }
 
     private fun spawnBug() {
         if (fieldWidth == 0 || fieldHeight == 0) return
+        if (fieldView.childCount >= maxBugsOnScreen) return
 
         val bugType = pickBugType()
         val bugDrawable = when (bugType) {
@@ -187,6 +218,7 @@ class GameFragment : Fragment() {
     }
 
     private fun registerMiss() {
+        if (!isRunning) return
         score += MISS_PENALTY
         misses += 1
         statusView.text = getString(R.string.status_miss)
@@ -198,19 +230,88 @@ class GameFragment : Fragment() {
         missesView.text = getString(R.string.misses_template, misses)
     }
 
+    private fun updateTimerView() {
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingRoundMillis)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingRoundMillis) % 60
+        timerView.text = getString(R.string.timer_template, minutes, seconds)
+    }
+
+    private fun startRoundTimer(durationMillis: Long) {
+        roundTimer?.cancel()
+        remainingRoundMillis = durationMillis
+        updateTimerView()
+        if (durationMillis <= 0L) {
+            finishRound()
+            return
+        }
+        roundTimer = object : CountDownTimer(durationMillis, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                remainingRoundMillis = millisUntilFinished
+                updateTimerView()
+            }
+
+            override fun onFinish() {
+                finishRound()
+            }
+        }.also { it.start() }
+    }
+
+    private fun finishRound() {
+        remainingRoundMillis = 0L
+        updateTimerView()
+        statusView.text = getString(R.string.status_round_over)
+        fieldView.removeAllViews()
+        stopGame()
+    }
+
+    private fun applySettings(settings: GameSettings) {
+        spawnDelay = computeSpawnDelay(settings.gameSpeed)
+        maxBugsOnScreen = max(settings.maxBugs, 1)
+        bonusIntervalMillis = max(settings.bonusIntervalSeconds, 0) * 1000L
+        if (bonusIntervalMillis > 0L) {
+            lastBonusSpawnAt = SystemClock.uptimeMillis()
+        }
+        val newRoundDuration = max(settings.roundDurationSeconds, MIN_ROUND_DURATION)
+        roundDurationSeconds = newRoundDuration
+        val newRoundDurationMillis = newRoundDuration * 1000L
+        remainingRoundMillis = if (isRunning) {
+            min(remainingRoundMillis, newRoundDurationMillis)
+        } else {
+            newRoundDurationMillis
+        }
+        if (isRunning) {
+            startRoundTimer(remainingRoundMillis)
+        } else {
+            updateTimerView()
+        }
+    }
+
     private fun pickBugType(): BugType {
+        val now = SystemClock.uptimeMillis()
+        if (bonusIntervalMillis > 0L && now - lastBonusSpawnAt >= bonusIntervalMillis) {
+            lastBonusSpawnAt = now
+            return BugType.BONUS
+        }
         val roll = Random.nextInt(100)
-        return when {
+        val type = when {
             roll < 10 -> BugType.BONUS
             roll < 25 -> BugType.POISON
             else -> BugType.NORMAL
         }
+        if (type == BugType.BONUS) {
+            lastBonusSpawnAt = now
+        }
+        return type
     }
 
     private enum class BugType { NORMAL, BONUS, POISON }
 
     companion object {
-        private const val SPAWN_DELAY = 1200L
+        private const val DEFAULT_SPAWN_DELAY = 1200L
+        private const val DEFAULT_MAX_BUGS = 15
+        private const val DEFAULT_BONUS_INTERVAL = 10000L
+        private const val DEFAULT_ROUND_DURATION = 60
+        private const val MIN_ROUND_DURATION = 5
         private const val NORMAL_DURATION = 3500L
         private const val BONUS_DURATION = 2500L
         private const val POISON_DURATION = 3200L
@@ -218,11 +319,20 @@ class GameFragment : Fragment() {
         private const val BONUS_SCORE = 50
         private const val POISON_PENALTY = -20
         private const val MISS_PENALTY = -5
+        private const val BASE_SPAWN_DELAY = 2000L
+        private const val SPAWN_DELAY_STEP = 150L
+        private const val MIN_GAME_SPEED = 1
 
         private val NORMAL_BUGS = listOf(
             R.drawable.bug_green,
             R.drawable.bug_blue,
             R.drawable.bug_orange
         )
+
+        private fun computeSpawnDelay(gameSpeed: Int): Long {
+            val speed = max(gameSpeed, MIN_GAME_SPEED)
+            val adjusted = BASE_SPAWN_DELAY - (speed - MIN_GAME_SPEED) * SPAWN_DELAY_STEP
+            return max(400L, adjusted)
+        }
     }
 }
