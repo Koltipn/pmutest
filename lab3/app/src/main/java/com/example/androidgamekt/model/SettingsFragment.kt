@@ -7,23 +7,14 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import com.example.androidgamekt.R
 
 class SettingsFragment : Fragment() {
-
-    private val settingsViewModel: GameSettingsViewModel by activityViewModels()
-
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_settings, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
         val sbGameSpeed = view.findViewById<SeekBar>(R.id.sbGameSpeed)
         val tvGameSpeed = view.findViewById<TextView>(R.id.tvGameSpeedValue)
@@ -36,73 +27,36 @@ class SettingsFragment : Fragment() {
 
         sbGameSpeed.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val value = progress.coerceAtLeast(1)
-                tvGameSpeed.text = getString(R.string.settings_game_speed_value, value)
-                if (fromUser) {
-                    settingsViewModel.setGameSpeed(value)
-                }
+                tvGameSpeed.text = "Скорость игры: $progress"
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
         sbMaxRoaches.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val value = progress.coerceAtLeast(1)
-                tvMaxRoaches.text = getString(R.string.settings_max_bugs_value, value)
-                if (fromUser) {
-                    settingsViewModel.setMaxBugs(value)
-                }
+                tvMaxRoaches.text = "Макс. тараканов: $progress"
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
         sbBonusInterval.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val value = progress.coerceAtLeast(0)
-                tvBonusInterval.text = getString(R.string.settings_bonus_interval_value, value)
-                if (fromUser) {
-                    settingsViewModel.setBonusInterval(value)
-                }
+                tvBonusInterval.text = "Интервал бонусов: ${progress}s"
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
         sbRoundDuration.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val value = progress.coerceAtLeast(5)
-                tvRoundDuration.text = getString(R.string.settings_round_duration_value, value)
-                if (fromUser) {
-                    settingsViewModel.setRoundDuration(value)
-                }
+                tvRoundDuration.text = "Длительность раунда: ${progress}s"
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        settingsViewModel.settings.observe(viewLifecycleOwner) { settings ->
-            if (sbGameSpeed.progress != settings.gameSpeed) {
-                sbGameSpeed.progress = settings.gameSpeed
-            }
-            if (sbMaxRoaches.progress != settings.maxBugs) {
-                sbMaxRoaches.progress = settings.maxBugs
-            }
-            if (sbBonusInterval.progress != settings.bonusIntervalSeconds) {
-                sbBonusInterval.progress = settings.bonusIntervalSeconds
-            }
-            if (sbRoundDuration.progress != settings.roundDurationSeconds) {
-                sbRoundDuration.progress = settings.roundDurationSeconds
-            }
-            tvGameSpeed.text = getString(R.string.settings_game_speed_value, settings.gameSpeed)
-            tvMaxRoaches.text = getString(R.string.settings_max_bugs_value, settings.maxBugs)
-            tvBonusInterval.text = getString(R.string.settings_bonus_interval_value, settings.bonusIntervalSeconds)
-            tvRoundDuration.text = getString(R.string.settings_round_duration_value, settings.roundDurationSeconds)
-        }
+        return view
     }
 }
