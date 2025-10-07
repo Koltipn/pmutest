@@ -8,10 +8,10 @@
     <string name="misses_template">Промахи: %1$d</string>
     <string name="status_running">Раунд начался!</string>
     <string name="status_restart">Новый раунд!</string>
-    <string name="status_bug_down">Жук уничтожен!</string>
-    <string name="status_bonus">Бонус собран!</string>
-    <string name="status_poison">Ой! Ядовитый жук!</string>
-    <string name="status_miss">Промах — штраф</string>
+    <string name="status_bug_down">Жук уничтожен + 10 очков!</string>
+    <string name="status_bonus">Бонус собран + 50 очков😎!</string>
+    <string name="status_poison">Ой! Ядовитый жук - 20 очков!</string>
+    <string name="status_miss">Промах — штраф - 5 очков</string>
     <string name="status_round_over">Время вышло! Раунд завершён.</string>
     <string name="cd_normal_bug">Обычный жук</string>
     <string name="cd_bonus_bug">Бонус</string>
