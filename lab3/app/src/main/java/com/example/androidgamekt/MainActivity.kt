@@ -17,15 +17,29 @@ class MainActivity : AppCompatActivity() {
 
         val adapter = ViewPagerAdapter(this)
         viewPager.adapter = adapter
+        viewPager.offscreenPageLimit = adapter.itemCount
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> "Регистрация"
-                1 -> "Правила"
-                2 -> "Авторы"
-                3 -> "Настройки"
+                0 -> "Игра"
+                1 -> "Регистрация"
+                2 -> "Правила"
+                3 -> "Авторы"
+                4 -> "Настройки"
                 else -> null
             }
         }.attach()
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                viewPager.setCurrentItem(tab.position, false)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab) {
+                viewPager.setCurrentItem(tab.position, false)
+            }
+        })
     }
 }
