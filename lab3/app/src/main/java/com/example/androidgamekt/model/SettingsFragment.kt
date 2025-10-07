@@ -7,14 +7,11 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.example.androidgamekt.R
-import kotlin.LazyThreadSafetyMode
 class SettingsFragment : Fragment() {
 
-    private val settingsViewModel: GameSettingsViewModel by lazy(LazyThreadSafetyMode.NONE) {
-        ViewModelProvider(requireActivity())[GameSettingsViewModel::class.java]
-    }
+    private val settingsViewModel: GameSettingsViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
