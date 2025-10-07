@@ -38,19 +38,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Уровень сложности:"
-        android:layout_marginTop="16dp" />
-
-    <SeekBar
-        android:id="@+id/sbDifficulty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:max="10"
-        android:progress="5" />
-
     <CalendarView
         android:id="@+id/cvBirthDate"
         android:layout_width="match_parent"
