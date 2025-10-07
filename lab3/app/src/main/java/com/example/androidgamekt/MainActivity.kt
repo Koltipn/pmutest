@@ -6,6 +6,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.androidgamekt.util.ViewPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,14 +33,21 @@ class MainActivity : AppCompatActivity() {
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                viewPager.setCurrentItem(tab.position, false)
+                updateCurrentItem(viewPager, tab)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab) {}
 
             override fun onTabReselected(tab: TabLayout.Tab) {
-                viewPager.setCurrentItem(tab.position, false)
+                updateCurrentItem(viewPager, tab)
             }
         })
+    }
+
+    private fun updateCurrentItem(viewPager: ViewPager2, tab: TabLayout.Tab) {
+        val current = viewPager.currentItem
+        val target = tab.position
+        val smoothScroll = abs(target - current) == 1
+        viewPager.setCurrentItem(target, smoothScroll)
     }
 }
