@@ -356,8 +356,6 @@ class GameFragment : Fragment() {
         private const val MIN_GAME_SPEED = 1
 
         private val NORMAL_BUGS = listOf(
-            R.drawable.bug_green,
-            R.drawable.bug_blue,
             R.drawable.bug_orange
         )
 
