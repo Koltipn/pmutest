@@ -16,8 +16,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import com.example.androidgamekt.R
+import kotlin.LazyThreadSafetyMode
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
@@ -32,7 +33,9 @@ class GameFragment : Fragment() {
     private lateinit var timerView: TextView
     private lateinit var restartButton: Button
 
-    private val settingsViewModel: GameSettingsViewModel by activityViewModels()
+    private val settingsViewModel: GameSettingsViewModel by lazy(LazyThreadSafetyMode.NONE) {
+        ViewModelProvider(requireActivity())[GameSettingsViewModel::class.java]
+    }
 
     private val spawnHandler = Handler(Looper.getMainLooper())
     private val spawnRunnable = object : Runnable {
@@ -99,6 +102,7 @@ class GameFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        settingsViewModel.settings.value?.let { applySettings(it) }
         startGame()
     }
 
