@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">Bugs Game</string>
+    <string name="score_initial">Счёт: 0</string>
+    <string name="misses_initial">Промахи: 0</string>
+    <string name="status_initial">Поймайте жука, чтобы заработать очки!</string>
+    <string name="restart_button">Перезапустить раунд</string>
+    <string name="score_template">Счёт: %1$d</string>
+    <string name="misses_template">Промахи: %1$d</string>
+    <string name="status_running">Раунд начался!</string>
+    <string name="status_restart">Новый раунд!</string>
+    <string name="status_bug_down">Жук уничтожен!</string>
+    <string name="status_bonus">Бонус собран!</string>
+    <string name="status_poison">Ой! Ядовитый жук!</string>
+    <string name="status_miss">Промах — штраф</string>
+    <string name="cd_normal_bug">Обычный жук</string>
+    <string name="cd_bonus_bug">Бонус</string>
+    <string name="cd_poison_bug">Ядовитый жук</string>
 </resources>
