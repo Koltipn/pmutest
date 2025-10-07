@@ -58,6 +58,7 @@ class GameFragment : Fragment() {
     private var remainingRoundMillis = DEFAULT_ROUND_DURATION * 1000L
     private var roundTimer: CountDownTimer? = null
     private var lastBonusSpawnAt = SystemClock.uptimeMillis()
+    private var needsRoundReset = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,11 +104,15 @@ class GameFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         settingsViewModel.settings.value?.let { applySettings(it) }
+        if (needsRoundReset) {
+            prepareNewRoundState()
+        }
         startGame()
     }
 
     override fun onPause() {
         super.onPause()
+        needsRoundReset = true
         stopGame()
     }
 
@@ -119,6 +124,9 @@ class GameFragment : Fragment() {
 
     private fun startGame() {
         if (isRunning) return
+        if (needsRoundReset) {
+            prepareNewRoundState()
+        }
         if (remainingRoundMillis <= 0L) {
             remainingRoundMillis = roundDurationSeconds * 1000L
         }
@@ -138,6 +146,12 @@ class GameFragment : Fragment() {
 
     private fun resetGame() {
         stopGame()
+        needsRoundReset = true
+        statusView.text = getString(R.string.status_restart)
+        startGame()
+    }
+
+    private fun prepareNewRoundState() {
         score = 0
         misses = 0
         fieldView.removeAllViews()
@@ -145,8 +159,7 @@ class GameFragment : Fragment() {
         lastBonusSpawnAt = SystemClock.uptimeMillis()
         updateScoreboard()
         updateTimerView()
-        statusView.text = getString(R.string.status_restart)
-        startGame()
+        needsRoundReset = false
     }
 
     private fun spawnBug() {
@@ -266,6 +279,7 @@ class GameFragment : Fragment() {
         statusView.text = getString(R.string.status_round_over)
         fieldView.removeAllViews()
         stopGame()
+        needsRoundReset = true
     }
 
     private fun applySettings(settings: GameSettings) {
@@ -356,6 +370,8 @@ class GameFragment : Fragment() {
         private const val MIN_GAME_SPEED = 1
 
         private val NORMAL_BUGS = listOf(
+            R.drawable.bug_green,
+            R.drawable.bug_blue,
             R.drawable.bug_orange
         )
 
