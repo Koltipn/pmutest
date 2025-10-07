@@ -265,24 +265,52 @@ class GameFragment : Fragment() {
     }
 
     private fun applySettings(settings: GameSettings) {
-        spawnDelay = computeSpawnDelay(settings.gameSpeed)
-        maxBugsOnScreen = max(settings.maxBugs, 1)
-        bonusIntervalMillis = max(settings.bonusIntervalSeconds, 0) * 1000L
-        if (bonusIntervalMillis > 0L) {
+        val newSpawnDelay = computeSpawnDelay(settings.gameSpeed)
+        val newMaxBugs = max(settings.maxBugs, 1)
+        val newBonusInterval = max(settings.bonusIntervalSeconds, 0) * 1000L
+        val newRoundDuration = max(settings.roundDurationSeconds, MIN_ROUND_DURATION)
+
+        val spawnDelayChanged = newSpawnDelay != spawnDelay
+        val bonusIntervalChanged = newBonusInterval != bonusIntervalMillis
+        val roundDurationChanged = newRoundDuration != roundDurationSeconds
+
+        spawnDelay = newSpawnDelay
+        maxBugsOnScreen = newMaxBugs
+        bonusIntervalMillis = newBonusInterval
+
+        if (bonusIntervalChanged && bonusIntervalMillis > 0L) {
             lastBonusSpawnAt = SystemClock.uptimeMillis()
         }
-        val newRoundDuration = max(settings.roundDurationSeconds, MIN_ROUND_DURATION)
+
         roundDurationSeconds = newRoundDuration
         val newRoundDurationMillis = newRoundDuration * 1000L
-        remainingRoundMillis = if (isRunning) {
-            min(remainingRoundMillis, newRoundDurationMillis)
-        } else {
-            newRoundDurationMillis
-        }
+
         if (isRunning) {
-            startRoundTimer(remainingRoundMillis)
+            trimBugsToLimit()
+            if (roundDurationChanged) {
+                remainingRoundMillis = newRoundDurationMillis
+                startRoundTimer(remainingRoundMillis)
+            } else {
+                remainingRoundMillis = min(remainingRoundMillis, newRoundDurationMillis)
+                startRoundTimer(remainingRoundMillis)
+            }
+            if (spawnDelayChanged) {
+                restartSpawnLoop()
+            }
         } else {
+            remainingRoundMillis = newRoundDurationMillis
             updateTimerView()
+        }
+    }
+
+    private fun restartSpawnLoop() {
+        spawnHandler.removeCallbacks(spawnRunnable)
+        spawnHandler.postDelayed(spawnRunnable, spawnDelay)
+    }
+
+    private fun trimBugsToLimit() {
+        while (fieldView.childCount > maxBugsOnScreen) {
+            fieldView.removeViewAt(0)
         }
     }
 
