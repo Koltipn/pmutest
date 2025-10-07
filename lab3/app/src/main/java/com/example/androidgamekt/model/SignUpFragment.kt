@@ -22,7 +22,6 @@ class SignUpFragment : Fragment() {
         val etFullName = view.findViewById<EditText>(R.id.etFullName)
         val rgGender = view.findViewById<RadioGroup>(R.id.rgGender)
         val spCourse = view.findViewById<Spinner>(R.id.spCourse)
-        val sbDifficulty = view.findViewById<SeekBar>(R.id.sbDifficulty)
         val cvBirthDate = view.findViewById<CalendarView>(R.id.cvBirthDate)
         val ivZodiac = view.findViewById<ImageView>(R.id.ivZodiac)
         val btnSubmit = view.findViewById<Button>(R.id.btnSubmit)
@@ -70,7 +69,6 @@ class SignUpFragment : Fragment() {
             }
 
             val course = spCourse.selectedItem.toString()
-            val difficulty = sbDifficulty.progress
             val zodiacSign = getZodiacSign(selectedDate)
 
             val zodiacDrawable = when (zodiacSign) {
@@ -90,13 +88,12 @@ class SignUpFragment : Fragment() {
             }
             ivZodiac.setImageResource(zodiacDrawable)
 
-            val player = Player(fullName, gender, course, difficulty, selectedDate, zodiacSign)
+            val player = Player(fullName, gender, course,selectedDate, zodiacSign)
 
             tvResult.text = """
                 ФИО: ${player.fullName}
                 Пол: ${player.gender}
                 Курс: ${player.course}
-                Уровень сложности: ${player.difficulty}
                 Дата рождения: ${player.birthDate}
                 Знак зодиака: ${player.zodiacSign}
             """.trimIndent()
