@@ -12,18 +12,7 @@
     <string name="status_bonus">Бонус собран!</string>
     <string name="status_poison">Ой! Ядовитый жук!</string>
     <string name="status_miss">Промах — штраф</string>
-    <string name="status_round_over">Время вышло! Раунд завершён.</string>
     <string name="cd_normal_bug">Обычный жук</string>
     <string name="cd_bonus_bug">Бонус</string>
     <string name="cd_poison_bug">Ядовитый жук</string>
-    <string name="timer_initial">Время: 01:00</string>
-    <string name="timer_template">Время: %1$02d:%2$02d</string>
-    <string name="settings_game_speed_value_initial">Скорость игры: 5</string>
-    <string name="settings_max_bugs_value_initial">Макс. тараканов: 15</string>
-    <string name="settings_bonus_interval_value_initial">Интервал бонусов: 10с</string>
-    <string name="settings_round_duration_value_initial">Длительность раунда: 60с</string>
-    <string name="settings_game_speed_value">Скорость игры: %1$d</string>
-    <string name="settings_max_bugs_value">Макс. тараканов: %1$d</string>
-    <string name="settings_bonus_interval_value">Интервал бонусов: %1$dс</string>
-    <string name="settings_round_duration_value">Длительность раунда: %1$dс</string>
 </resources>
