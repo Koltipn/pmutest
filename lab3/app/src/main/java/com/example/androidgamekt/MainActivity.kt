@@ -20,10 +20,11 @@ class MainActivity : AppCompatActivity() {
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> "Регистрация"
-                1 -> "Правила"
-                2 -> "Авторы"
-                3 -> "Настройки"
+                0 -> "Игра"
+                1 -> "Регистрация"
+                2 -> "Правила"
+                3 -> "Авторы"
+                4 -> "Настройки"
                 else -> null
             }
         }.attach()
