@@ -26,21 +26,40 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Максимальное количество тараканов"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp"
+        android:text="Скорость движения тараканов" />
+
+    <SeekBar
+        android:id="@+id/sbBugSpeed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="10"
+        android:progress="5" />
+
+    <TextView
+        android:id="@+id/tvBugSpeedValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Скорость движения: 5" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Максимальное количество тараканов" />
 
     <SeekBar
         android:id="@+id/sbMaxRoaches"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="50"
-        android:progress="20" />
+        android:progress="15" />
 
     <TextView
         android:id="@+id/tvMaxRoachesValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Макс. тараканов: 20" />
+        android:text="Макс. тараканов: 15" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -59,7 +78,7 @@
         android:id="@+id/tvBonusIntervalValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Интервал бонусов: 10s" />
+        android:text="Интервал бонусов: 10с" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -78,6 +97,6 @@
         android:id="@+id/tvRoundDurationValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Длительность раунда: 60s" />
+        android:text="Длительность раунда: 60с" />
 
 </LinearLayout>
