@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="bug_size">72dp</dimen>
+    <dimen name="bug_size_normal">72dp</dimen>
+    <dimen name="bug_size_bonus">60dp</dimen>   <!-- бонусный крупнее -->
+    <dimen name="bug_size_poison">94dp</dimen>  <!-- пример для ядовитого -->
 </resources>

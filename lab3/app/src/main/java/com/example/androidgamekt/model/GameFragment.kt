@@ -173,7 +173,11 @@ class GameFragment : Fragment() {
             BugType.POISON -> R.drawable.bug_poison
         }
 
-        val bugSize = resources.getDimensionPixelSize(R.dimen.bug_size)
+        val bugSize = when (bugType) {
+            BugType.BONUS  -> resources.getDimensionPixelSize(R.dimen.bug_size_bonus)
+            BugType.POISON -> resources.getDimensionPixelSize(R.dimen.bug_size_poison)
+            else           -> resources.getDimensionPixelSize(R.dimen.bug_size_normal)
+        }
         val bugView = ImageView(requireContext()).apply {
             layoutParams = FrameLayout.LayoutParams(bugSize, bugSize)
             setImageDrawable(ContextCompat.getDrawable(requireContext(), bugDrawable))
